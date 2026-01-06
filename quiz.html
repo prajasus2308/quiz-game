@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Quiz Game</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1d2671, #c33764);
+}
+
+.quiz-container {
+  background: #fff;
+  width: 360px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+h1 {
+  margin-bottom: 15px;
+}
+
+#question {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.btn-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #1d2671;
+  color: white;
+  font-size: 14px;
+}
+
+.btn:hover {
+  background: #3a47d5;
+}
+
+.correct {
+  background: #28a745 !important;
+}
+
+.wrong {
+  background: #dc3545 !important;
+}
+
+.controls {
+  margin-top: 15px;
+}
+
+.hide {
+  display: none;
+}
+
+#score {
+  margin-top: 10px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+  <h1>🧠 Quiz Game</h1>
+
+  <p id="question">Question appears here</p>
+
+  <div id="answer-buttons" class="btn-grid"></div>
+
+  <div class="controls">
+    <button id="next-btn" class="btn hide">Next</button>
+    <button id="restart-btn" class="btn hide">Restart</button>
+  </div>
+
+  <p id="score">Score: 0</p>
+</div>
+
+<script>
+const questions = [
+  {
+    question: "What does HTML stand for?",
+    answers: [
+      { text: "Hyper Text Markup Language", correct: true },
+      { text: "High Text Machine Language", correct: false },
+      { text: "Hyper Tool Markup Language", correct: false },
+      { text: "None of these", correct: false }
+    ]
+  },
+  {
+    question: "Which language is used for styling web pages?",
+    answers: [
+      { text: "HTML", correct: false },
+      { text: "CSS", correct: true },
+      { text: "Python", correct: false },
+      { text: "Java", correct: false }
+    ]
+  },
+  {
+    question: "Which is NOT a JavaScript framework?",
+    answers: [
+      { text: "React", correct: false },
+      { text: "Angular", correct: false },
+      { text: "Vue", correct: false },
+      { text: "Django", correct: true }
+    ]
+  }
+];
+
+const questionEl = document.getElementById("question");
+const answerBtns = document.getElementById("answer-buttons");
+const nextBtn = document.getElementById("next-btn");
+const restartBtn = document.getElementById("restart-btn");
+const scoreEl = document.getElementById("score");
+
+let currentQuestion = 0;
+let score = 0;
+
+startQuiz();
+
+function startQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  scoreEl.textContent = "Score: 0";
+  restartBtn.classList.add("hide");
+  showQuestion();
+}
+
+function showQuestion() {
+  resetState();
+  let q = questions[currentQuestion];
+  questionEl.textContent = q.question;
+
+  q.answers.forEach(ans => {
+    const btn = document.createElement("button");
+    btn.textContent = ans.text;
+    btn.classList.add("btn");
+    if (ans.correct) btn.dataset.correct = ans.correct;
+    btn.onclick = selectAnswer;
+    answerBtns.appendChild(btn);
+  });
+}
+
+function resetState() {
+  nextBtn.classList.add("hide");
+  answerBtns.innerHTML = "";
+}
+
+function selectAnswer(e) {
+  const selected = e.target;
+  const correct = selected.dataset.correct === "true";
+
+  if (correct) {
+    selected.classList.add("correct");
+    score++;
+    scoreEl.textContent = `Score: ${score}`;
+  } else {
+    selected.classList.add("wrong");
+  }
+
+  Array.from(answerBtns.children).forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.correct === "true") {
+      btn.classList.add("correct");
+    }
+  });
+
+  nextBtn.classList.remove("hide");
+}
+
+nextBtn.onclick = () => {
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  resetState();
+  questionEl.textContent = `🎉 Quiz Finished! Your Score: ${score}/${questions.length}`;
+  nextBtn.classList.add("hide");
+  restartBtn.classList.remove("hide");
+}
+
+restartBtn.onclick = startQuiz;
+</script>
+
+</body>
+</html>
